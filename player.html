@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Audio Media Player</title>
+    <div id="controls">
+            <!-- <span id="loading" >loading</span> -->
+            <button id="play" style="display:block" onclick=playAudio()>play</button>
+            <button id="pause" style="display:none" onclick=pauseAudio() >pause</button>
+          </div>
+    <div id="progress">
+        <div id="bar"></div>
+    </div>
+    <br>
+    <!-- <button onclick=stopAudio()>Stop</button> -->
+    <div style="float:left">
+            <button id="stopTrack1" disabled=true style="display:block" onclick=onStopFirstTrack()>Stop track1 audio</button>
+            <button id="playTrack1" style="display:none" onclick=onPlayFirstTrack()>Play track1 audio</button>
+    </div>
+    <div style="float:left">
+            <button id="stopTrack2" disabled=true style="display:block" onclick=onStopSecondTrack()>Stop track2 audio</button>
+            <button id="playTrack2" style="display:none" onclick=onPlaySecondTrack()>Play track2 audio</button>
+    </div>
+    <div style="float:right">
+        <button onclick=onBackwardTrack()>Backward 10 sec</button>
+        <button onclick=onForwardTrack()>Forward 10 sec</button>
+    </div>
+    <style>
+            #controls {
+            width: 80px;
+            float: left;
+            }
+                
+            #progress {
+            margin-left: 80px;
+            border: 1px solid black;
+            }
+    
+            #bar {
+            height: 20px;
+            background-color: green;
+            width: 0;
+            }
+        </style>
+</head>
+<body>
+    <script>
+        //  window.onload = function(){
+        let firstTrack = new Audio();
+        // console.log("Audio",new Audio());
+        let srcFirstTrack = document.createElement("source");
+        let secondTrack = new Audio();
+        let srcSecondTrack = document.createElement("source");
+        // Play audio
+        function playAudio(){
+            play.style.display = "none";
+            pause.style.display = "block";
+            srcFirstTrack.type = "audio/mpeg";
+            srcFirstTrack.src  = "./mp3/bensound-acousticbreeze.mp3";
+            firstTrack.appendChild(srcFirstTrack);
+            console.log("tag1",firstTrack)
+            srcSecondTrack.type = "audio/mpeg";
+            srcSecondTrack.src  = "./mp3/bensound-epic.mp3";
+            secondTrack.appendChild(srcSecondTrack);
+
+            firstTrack.play(); 
+            secondTrack.play(); // Now both will play at the same time
+            stopTrack1.disabled = false;
+            stopTrack2.disabled = false;
+        }
+        // Pause Audio
+        function pauseAudio(){
+            pause.style.display = "none";
+            play.style.display = "block";
+            firstTrack.pause(); secondTrack.pause(); // Now both will play at the same time
+        }
+        // Stop Audio
+        function stopAudio(){
+            firstTrack.pause(); secondTrack.pause();
+            firstTrack.currentTime = 0; secondTrack.currentTime = 0; // Now both will play at the same time
+        }
+        // Stop first track audio
+        function onStopFirstTrack(){
+            playTrack1.style.display = "block";
+            stopTrack1.style.display = "none";
+            firstTrack.pause();
+            firstTrack.currentTime=0;
+        }
+        // Stop second track audio
+        function onStopSecondTrack(){
+            playTrack2.style.display = "block";
+            stopTrack2.style.display = "none";
+            secondTrack.pause();
+            secondTrack.currentTime=0;
+        }
+        // Play first track audio
+        function onPlayFirstTrack(){
+            playTrack1.style.display = "none";
+            stopTrack1.style.display = "block";
+            let secondTrackCurrentTime=secondTrack.currentTime;
+            firstTrack.currentTime=secondTrackCurrentTime;
+            firstTrack.play();
+        }
+        // Play second track audio
+        function onPlaySecondTrack(){
+            playTrack2.style.display = "none";
+            stopTrack2.style.display = "block";
+            let firstTrackCurrentTime=firstTrack.currentTime;
+            secondTrack.currentTime=firstTrackCurrentTime;
+            secondTrack.play();
+        }
+        // On move backward
+        function onBackwardTrack(){
+            console.log(firstTrack.currentTime)
+            if(firstTrack.currentTime>=10 || secondTrack.currentTime>=10){
+                firstTrack.currentTime-=10;
+                firstTrack.play();
+                secondTrack.currentTime-=10;
+                secondTrack.play();
+            }
+            else{
+                firstTrack.currentTime=0;
+                firstTrack.play();
+                secondTrack.currentTime=0;
+                secondTrack.play();
+            }
+        }
+        // On move Forward
+        function onForwardTrack(){
+            console.log(firstTrack.currentTime)
+                firstTrack.currentTime+=10;
+                firstTrack.play();
+                secondTrack.currentTime+=10;
+                secondTrack.play();
+        }
+
+        // display progress
+            
+        firstTrack.addEventListener('timeupdate', function() {
+            //sets the percentage
+            bar.style.width = parseInt(((firstTrack.currentTime / firstTrack.duration) * 100), 10) + "%";
+        });
+        secondTrack.addEventListener('timeupdate', function() {
+            //sets the percentage
+            bar.style.width = parseInt(((secondTrack.currentTime / secondTrack.duration) * 100), 10) + "%";
+        });
+
+        var progress = document.getElementById('progress');
+            progress.addEventListener('click', function(e) {
+                
+            // calculate the normalized position clicked
+            var clickPosition = (e.pageX  - this.offsetLeft) / this.offsetWidth;
+            var clickTime = clickPosition * firstTrack.duration;
+
+            // move the playhead to the correct position
+            firstTrack.currentTime = clickTime;
+            // move the playhead to the correct position
+            secondTrack.currentTime = clickTime;
+            });
+    // }
+    </script>
+</body>
+</html>
